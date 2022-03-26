@@ -40,6 +40,10 @@ io.on('connection', (socket) => {
   socket.on('answerCall', (data) => {
     io.to(data.to).emit('callAccepted', data.signal);
   });
+
+  socket.on('declineCall', (data) => {
+    io.to(data.to).emit('declineCall');
+  });
 });
 
 app.use(cors());
