@@ -31,24 +31,24 @@ const signup = async (req,res) => {
     }
 
 };
-const login = async (req, res) =>{
+const loginAuth = async (req, res) =>{
     try {
         const { username, password } = req.body;
 
-        const serverClient = connect(api_key, api_secret, app_id);
+        const server = connect(api_key, api_secret, app_id);
 
-        const client = StreamChat.getInstance(api_key, api_secret);
+        const clientServer = StreamChat.getInstance(api_key, api_secret);
 
-        const {users} = await client.queryUsers({ name: username });
+        const {usersTake} = await clientServer.queryUsers({ name: username });
 
-        if(!users.length) return res.status(400).json({ message: 'User not found'});
+        if(!usersTake.length) return res.status(400).json({ message: 'Utilizatorul nu a fost gasit!'});
 
-        const success = await bcrypt.compare(password, users[0].hashedPassword);
+        const successfulDecrypt = await bcrypt.compare(password, usersTake[0].hashedPassword);
 
-        const token = serverClient.createUserToken(users[0].id);
+        const tokenSessionID = server.createUserToken(usersTake[0].id);
 
-        if(success){
-            res.status(200).json({token, fullName: users[0].fullName, username, userId: users[0].id})
+        if(successfulDecrypt){
+            res.status(200).json({tokenSessionID, fullName: usersTake[0].fullName, username, userId: usersTake[0].id})
         }else{
             res.status(500).json({ message: 'Parolă greșită!'});
         }
@@ -60,4 +60,4 @@ const login = async (req, res) =>{
     }
 };
 
-module.exports={signup, login}
+module.exports={signup, loginAuth}
