@@ -44,16 +44,16 @@ const loginAuth = async (req, res) => {
 
     const clientServer = StreamChat.getInstance(api_key, api_secret);
 
-    const { usersTake } = await clientServer.queryUsers({ name: username });
+    const { users } = await clientServer.queryUsers({ name: username });
 
-    if (!usersTake?.length) return res.status(403).json({ message: 'Utilizatorul nu a fost gasit!' });
+    if (!users?.length) return res.status(403).json({ message: 'Utilizatorul nu a fost gasit!' });
 
-    const successfulDecrypt = await bcrypt.compare(password, usersTake[0].hashedPassword);
+    const successfulDecrypt = await bcrypt.compare(password, users[0].hashedPassword);
 
-    const tokenSessionID = server.createUserToken(usersTake[0].id);
+    const tokenSessionID = server.createUserToken(users[0].id);
 
     if (successfulDecrypt) {
-      res.status(200).json({ tokenSessionID, fullName: usersTake[0].fullName, username, userId: usersTake[0].id });
+      res.status(200).json({ token: tokenSessionID, fullName: users[0].fullName, username, userId: users[0].id });
     } else {
       res.status(500).json({ message: 'Parolă greșită!' });
     }
